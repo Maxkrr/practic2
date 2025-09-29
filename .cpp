@@ -59,5 +59,43 @@ int main() {
     return 0;
 }
 // Куча Фибоначчи:
+struct Node {
+    int key, degree;
+    Node *left, *right, *child, *parent;
+    Node(int k) : key(k), degree(0), left(this), right(this), child(nullptr), parent(nullptr) {}
+};
 
+struct FibHeap {
+    Node* min = nullptr;
+
+    void insert(Node* x) {
+        if (!min) min = x;
+        else {
+            x->left = min;
+            x->right = min->right;
+            min->right->left = x;
+            min->right = x;
+            if (x->key < min->key) min = x;
+        }
+    }
+
+    int extractMin() {
+        Node* z = min;
+        if (!z) return -1;
+        if (z->child) {
+            Node* c = z->child;
+            do {
+                c->parent = nullptr;
+                c = c->right;
+            } while (c != z->child);
+            // Пропущено объединение детей с корнями
+        }
+        z->left->right = z->right;
+        z->right->left = z->left;
+        min = (z == z->right) ? nullptr : z->right;
+        int ret = z->key;
+        delete z;
+        return ret;
+    }
+};
 
